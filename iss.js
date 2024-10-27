@@ -27,7 +27,14 @@ const fetchMyIP = callback => {
   });
 };
 
-
+/**
+ * Function finds coordinates for a given IP via callback.
+ *
+ * @param {string} ip - The IP to look up coordinates for
+ * @Returns (via Callback):
+ *   - An error, if any (nullable)
+ *   - The coordinates as an object (null if error). Example: {latitude: x, longitude: y}
+ */
 const fetchCoordsByIP = (ip, callback) => {
 
   needle.get(`http://ipwho.is/${ip}`, (error, response, body) => {
@@ -53,4 +60,19 @@ const fetchCoordsByIP = (ip, callback) => {
   });
 };
 
-module.exports = { fetchMyIP, fetchCoordsByIP };
+const fetchISSFlyOverTimes = (coords, callback) => {
+  needle.get(`https://iss-flyover.herokuapp.com/json/?lat=${coords.latitude}&lon=${coords.longitude}`, (error, response, body) => {
+    if (error) return callback(error, null);
+
+    if (response.statusCode !== 200) {
+      const msg = `Status code ${response.statusCode} when fetching times for coordinates. Response ${body}`;
+      callback(Error(msg), null);
+      return;
+    }
+    const timesArray = body.response;
+    callback(null, timesArray);
+  });
+};
+
+
+module.exports = { fetchMyIP, fetchCoordsByIP, fetchISSFlyOverTimes };
