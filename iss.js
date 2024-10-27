@@ -98,17 +98,17 @@ const fetchISSFlyOverTimes = (coords, callback) => {
  *     [ { risetime: <number>, duration: <number> }, ... ]
  */
 const nextISSTimesForMyLocation = callback => {
-  // Get IP
+  // Call API to get IP address
   fetchMyIP((error, IP) => {
     // Check if error fetching IP
     if (error) return callback(error, null);
 
-    // If no error, get coords from IP
+    // If no error, call API to get coords from IP
     fetchCoordsByIP(IP, (error, coords) => {
       // Check if error fetching coords
       if (error) return callback(error, null);
 
-      // If no error, get pass times from coords
+      // If no error, call API to get pass times from coords
       fetchISSFlyOverTimes(coords, (error, passTimes) => {
         // Check if error fetching pass times
         if (error) return callback(error, null);
