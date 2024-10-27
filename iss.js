@@ -9,7 +9,7 @@ const needle = require("needle");
  *   - An error, if any (nullable)
  *   - The IP address as a string (null if error). Example: "162.245.144.188"
  */
-const fetchMyIP = function(callback) {
+const fetchMyIP = callback => {
   // use request to fetch IP address from JSON API
   needle.get('https://api.ipify.org?format=json', (error, response, body) => {
     // error can be set if invalid domain, user offline, etc.
@@ -27,4 +27,28 @@ const fetchMyIP = function(callback) {
   });
 };
 
-module.exports = { fetchMyIP };
+
+const fetchCoordsByIP = (ip, callback) => {
+
+  needle.get(`http://ipwho.is/${ip}`, (error, response, body) => {
+    // chceck for error from the request
+    if (error) return callback(error, null);
+
+    // check if "success" is true or not
+    if (!body.success) {
+      const message = `Success status was ${body.success}. Server message says: ${body.message} when fetching for IP ${body.ip}`;
+      callback(Error(message), null);
+      return;
+    }
+
+    if (response.statusCode !== 200) {
+      const msg = `Status Code ${response.statusCode} when fetching coords for IP. Response ${body}`;
+      callback(Error(msg, null));
+      return;
+    }
+    // No error
+    callback(body, null);
+  });
+};
+
+module.exports = { fetchMyIP, fetchCoordsByIP };
